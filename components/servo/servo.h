@@ -20,15 +20,19 @@ void configure_mcpwm_servo(mcpwm_timer_config_t* timer_struct,
         mcpwm_timer_handle_t*      timer_handle,
         mcpwm_operator_config_t*   operator_struct,
         mcpwm_oper_handle_t*       operator_handle,
-        mcpwm_comparator_config_t* comparator_struct,
-        mcpwm_cmpr_handle_t*       comparator_handle,
-        mcpwm_generator_config_t*  generator_struct,
-        mcpwm_gen_handle_t*  generator_handle);
+        mcpwm_comparator_config_t* comparator_azimuth_struct,
+        mcpwm_cmpr_handle_t*       comparator_azimuth_handle,
+        mcpwm_generator_config_t*  generator_azimuth_struct,
+        mcpwm_gen_handle_t*  generator_azimuth_handle,
+        mcpwm_comparator_config_t* comparator_altitude_struct,
+        mcpwm_cmpr_handle_t*       comparator_altitude_handle,
+        mcpwm_generator_config_t*  generator_altitude_struct,
+        mcpwm_gen_handle_t*  generator_altitude_handle);
 
 // Servo motors
     // Helper function to convert a desired servo angle in degrees
     // into a raw compare value (pulse width in microseconds).
-uint32_t example_angle_to_compare(int angle) {
+static inline uint32_t example_angle_to_compare(int angle) {
     return (angle - SERVO_MIN_DEGREE) * (SERVO_MAX_PULSEWIDTH_US - SERVO_MIN_PULSEWIDTH_US) / (SERVO_MAX_DEGREE - SERVO_MIN_DEGREE) + SERVO_MIN_PULSEWIDTH_US;
 }
 

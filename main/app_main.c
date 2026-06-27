@@ -21,16 +21,27 @@ void app_main(void) {
     mcpwm_operator_config_t operator_struct = {0};
     mcpwm_oper_handle_t operator_handle = NULL;
 
-    mcpwm_comparator_config_t comparator_struct = {0};
-    mcpwm_cmpr_handle_t comparator_handle = NULL;
+    // Azimuth conf
+    mcpwm_comparator_config_t comparator_azimuth_struct = {0};
+    mcpwm_cmpr_handle_t comparator_azimuth_handle = NULL;
 
-    mcpwm_generator_config_t generator_struct = {0};
-    mcpwm_gen_handle_t generator_handle = NULL;
+    mcpwm_generator_config_t generator_azimuth_struct = {0};
+    mcpwm_gen_handle_t generator_azimuth_handle = NULL;
+
+
+    // Altitude conf
+    mcpwm_comparator_config_t comparator_altitude_struct = {0};
+    mcpwm_cmpr_handle_t comparator_altitude_handle = NULL;
+
+    mcpwm_generator_config_t generator_altitude_struct = {0};
+    mcpwm_gen_handle_t generator_altitude_handle = NULL;
 
     configure_mcpwm_servo(&timer_struct, &timer_handle,
                           &operator_struct, &operator_handle,
-                          &comparator_struct, &comparator_handle,
-                          &generator_struct, &generator_handle);
+                          &comparator_azimuth_struct, &comparator_azimuth_handle,
+                          &generator_azimuth_struct, &generator_azimuth_handle,
+                          &comparator_altitude_struct, &comparator_altitude_handle,
+                          &generator_altitude_struct, &generator_altitude_handle);
 
 
     // Master specifying in slave which memory to read ! Check your data sheets !
@@ -44,9 +55,9 @@ void app_main(void) {
     i2c_master_transmit(master_slave_handle, write_buff, sizeof(write_buff), -1);
     int16_t x_axis, y_axis, z_axis;
     float x_float, y_float, z_float, angle_rad;
-    int target_angle;
+    int azimuth_angle, altitude_angle;
 
-    ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator_handle, example_angle_to_compare(0)));
+    ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator_azimuth_handle, example_angle_to_compare(0)));
 
     while(1) {
         esp_err_t err_status =  i2c_master_transmit_receive(master_slave_handle,
@@ -60,14 +71,24 @@ void app_main(void) {
                 x_float = (float)(x_axis);
                 y_float = (float)(y_axis);
                 z_float = (float)(z_axis);
+
+                // Azimuth angle calculation
                 angle_rad = atan2f(x_float, sqrtf((y_float * y_float) + (z_float * z_float)));
-                target_angle = (int)(angle_rad * 180.0f / M_PI); // M_PI is defined in math.h
+                azimuth_angle = (int)(angle_rad * 180.0f / M_PI); // M_PI is defined in math.h
 
-                if (target_angle < SERVO_MIN_DEGREE) target_angle = SERVO_MIN_DEGREE;
-                if (target_angle > SERVO_MAX_DEGREE) target_angle = SERVO_MAX_DEGREE;
+                // Altitude angle calculation
+                angle_rad = atan2f(y_float, sqrt((x_float * x_float) + (z_float * z_float)));
+                altitude_angle = (int)(angle_rad * 180.0f / M_PI);
 
-                ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator_handle, example_angle_to_compare(target_angle)));
-                printf("Raw X: %d | Calculated Angle: %d°\n", x_axis, target_angle);
+                if (azimuth_angle < SERVO_MIN_DEGREE) azimuth_angle = SERVO_MIN_DEGREE;
+                if (azimuth_angle > SERVO_MAX_DEGREE) azimuth_angle = SERVO_MAX_DEGREE;
+
+                if (altitude_angle < SERVO_MIN_DEGREE) altitude_angle = SERVO_MIN_DEGREE;
+                if (altitude_angle > SERVO_MAX_DEGREE) altitude_angle = SERVO_MAX_DEGREE;
+
+                ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator_azimuth_handle, example_angle_to_compare(azimuth_angle)));
+                ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator_altitude_handle, example_angle_to_compare(altitude_angle)));
+                printf("Azimuth (X): %d° | Altitude (Y): %d°\n", azimuth_angle, altitude_angle);
                 vTaskDelay(pdMS_TO_TICKS(1000));
             }
             else {
