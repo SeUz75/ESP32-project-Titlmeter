@@ -28,10 +28,12 @@ void configure_i2c_accelerometer(i2c_master_bus_config_t* master_conf,
 
     ESP_ERROR_CHECK(i2c_master_bus_add_device((*master_handle),
                 slave_conf, master_slave_handle));
+    ESP_LOGI(TAG, "Configuring i2c accelerometer \n");
 }
 
 
 void find_slave_address(i2c_master_bus_handle_t* master_handle_p) {
+    ESP_LOGI(TAG, "Finding slave address for I2C communcation \n");
     esp_err_t error_status = ESP_OK;
 
     printf("Master probe...\n");

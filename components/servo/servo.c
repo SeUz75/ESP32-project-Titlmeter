@@ -76,4 +76,6 @@ void configure_mcpwm_servo(mcpwm_timer_config_t* timer_struct,
 
     ESP_ERROR_CHECK(mcpwm_timer_enable((*timer_handle)));
     ESP_ERROR_CHECK(mcpwm_timer_start_stop((*timer_handle), MCPWM_TIMER_START_NO_STOP));
+
+    ESP_LOGI(TAG, "Configuring servo motors, azimuth and altitude \n");
 }

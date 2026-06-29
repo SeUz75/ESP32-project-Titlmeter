@@ -9,6 +9,6 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 
-const char *TAG = "main";
+static const char *TAG = "main";
 
 #endif // UTILS_H
