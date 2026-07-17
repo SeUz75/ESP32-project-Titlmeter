@@ -1,5 +1,3 @@
-// TODO !! DEALLOCATE THE OBJECTS IN THE SAME TRANSLATION UNIT THEY HAVE BEEN ALLOCATED !!!
-
 #include "utils.h"
 #include "gmeter.h"
 #include "servo.h"
@@ -95,7 +93,4 @@ void app_main(void) {
                 ESP_LOGI(TAG, "Could not receive data from Gmeter %s \n",esp_err_to_name(err_status));
             }
     }
-
-    // Releasing resources
-    // recycle_resources(master_handle, master_slave_handle);
 }
